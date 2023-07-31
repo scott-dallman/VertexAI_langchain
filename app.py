@@ -29,7 +29,7 @@ from langchain.agents import initialize_agent, AgentType, create_pandas_datafram
 @st.cache_resource
 def load_lang_model():
     """Loading the vertex model"""
-    return VertexAI(temperature=0.1,  top_p=40, top_k=0.95) # had to reverse number to work
+    return VertexAI(temperature=0.1)
 llm = load_lang_model()
 
 
@@ -47,7 +47,7 @@ if choice == "Create":
     st.title("Create with Gen AI")
     st.markdown(":blue[Transform your creative process with the power of GenAI! \
                 Eliminate writer’s block & boost productivity by generating writing]")
-    question = st.text_input('Ask a question to generate ideas on a topic')
+    prompt_create = st.text_input('Ask a question to generate ideas on a topic')
 
     TEMPLATE = """Question: {question}
     Answer: Let's think step by step."""
@@ -55,8 +55,8 @@ if choice == "Create":
     prompt = PromptTemplate(template=TEMPLATE, input_variables=["question"])
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
-    if question:
-        response = llm_chain.run(question)
+    if prompt_create:
+        response = llm_chain.run(prompt_create)
         #response = model.predict(question, max_output_tokens=256)
         st.markdown(response)
 
@@ -70,8 +70,8 @@ if choice == "Summarize":
 
     TEMPLATE = """Please summarize the text for me in a few sentences : {long_text} """
 
-    prompt = PromptTemplate(template=TEMPLATE, input_variables=["long_text"])
-    llm_chain = LLMChain(prompt=prompt, llm=llm)
+    prompt_summary = PromptTemplate(template=TEMPLATE, input_variables=["long_text"])
+    llm_chain = LLMChain(prompt=prompt_summary, llm=llm)
 
     if len(long_text) > 100:
         if st.button("Generate Summary"):
@@ -123,8 +123,8 @@ if choice == "Discover":
         verbose=True
         )
 
-    prompt = st.text_input('Ask a question about the doc')
-    if prompt:
+    prompt_discover = st.text_input('Ask a question about the doc')
+    if prompt_discover:
         with st.expander('Document Similarity Search'):
             #Find the relevant pages
             search = store.similarity_search_with_score(prompt)
@@ -143,7 +143,7 @@ if choice == "Automate":
 
     df_agent = create_pandas_dataframe_agent(llm=llm, df=df, verbose=True)
 
-    prompt = st.text_input('Ask a question about the doc')
-    if prompt:
+    prompt_choice = st.text_input('Ask a question about the doc')
+    if prompt_choice:
         response = df_agent.run(prompt)
         st.info(response)
