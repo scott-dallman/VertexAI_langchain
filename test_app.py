@@ -5,6 +5,7 @@ from langchain import PromptTemplate, LLMChain
 import pandas as pd
 import app
 
+
 def test_load_lang_model():
     """Test that the load_lang_model function returns a VertexAI model."""
     lm = app.load_lang_model()
@@ -44,3 +45,4 @@ def test_automate_content():
     prompt = "What is the survival rate for women?"
     response = df_agent.run(prompt)
     assert response != ""
+    

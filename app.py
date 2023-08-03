@@ -142,9 +142,9 @@ if choice == "Discover":
     if prompt_discover:
         with st.expander('Document Similarity Search'):
             # Find the relevant pages
-            search = store.similarity_search_with_score(prompt)
+            search = store.similarity_search_with_score(prompt_discover)
             st.write(search[0][0].page_content)
-        response = vector_agent.run(prompt)
+        response = vector_agent.run(prompt_discover)
         st.info(response)
 
 
@@ -154,11 +154,11 @@ if choice == "Automate":
     st.markdown(":blue[Transform from time consuming, \
                 expensive analytics processes to efficient ones.]")
     st.markdown("Dataframe with small Titanic dataset loaded ")
-    df = pd.read_csv("titanic.csv")
+    df = pd.read_csv("Titanic-Dataset.csv")
 
     df_agent = create_pandas_dataframe_agent(llm=llm, df=df, verbose=True)
 
     prompt_choice = st.text_input('Ask a question about the doc')
     if prompt_choice:
-        response = df_agent.run(prompt)
+        response = df_agent.run(prompt_choice)
         st.info(response)
