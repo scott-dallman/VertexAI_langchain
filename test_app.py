@@ -1,8 +1,14 @@
-import pytest
+"""Python code the creates a demo of different ways to use Vertex LLMs
+uses langchain and chromadb to vectorize PDF documents
 
-from langchain.llms import VertexAI
-from langchain import PromptTemplate, LLMChain
+Author: Scott Dallman
+"""
+
 import pandas as pd
+from langchain.chains import LLMChain
+from langchain_google_vertexai import VertexAI
+from langchain_core.prompts import PromptTemplate
+
 import app
 
 
@@ -15,7 +21,9 @@ def test_load_lang_model():
 def test_create_content():
     """Test that the create_content function generates text."""
     question = "What is the meaning of life?"
-    prompt = PromptTemplate(template="Question: {question}", input_variables=["question"])
+    prompt = PromptTemplate(
+        template="Question: {question}", input_variables=["question"]
+    )
     llm_chain = LLMChain(prompt=prompt, llm=app.load_lang_model())
     response = llm_chain.run(question)
     assert response != ""
@@ -24,7 +32,10 @@ def test_create_content():
 def test_summarize_content():
     """Test that the summarize_content function summarizes text."""
     long_text = "This is a long text that I want to summarize."
-    prompt = PromptTemplate(template="Please summarize the text for me in a few sentences : {long_text}", input_variables=["long_text"])
+    prompt = PromptTemplate(
+        template="Please summarize the text for me in a few sentences : {long_text}",
+        input_variables=["long_text"],
+    )
     llm_chain = LLMChain(prompt=prompt, llm=app.load_lang_model())
     response = llm_chain.run(long_text)
     assert response != ""
@@ -45,4 +56,3 @@ def test_automate_content():
     prompt = "What is the survival rate for women?"
     response = df_agent.run(prompt)
     assert response != ""
-    

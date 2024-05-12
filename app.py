@@ -4,31 +4,27 @@ uses langchain and chromadb to vectorize PDF documents
 Author: Scott Dallman
 """
 
-# imports
-from PIL import Image
-import streamlit as st
 import pandas as pd
+import streamlit as st
+from langchain.agents import AgentType, initialize_agent
 
-# Import langchain vertex AI implementation
-from langchain_google_vertexai import VertexAI
-from langchain_google_vertexai import VertexAIEmbeddings
-from langchain_core.prompts import PromptTemplate
+# Import vector stores
+from langchain.agents.agent_toolkits import VectorStoreInfo, VectorStoreToolkit
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 
-# Import PDF document loaders
-from langchain_community.document_loaders import PyPDFLoader
-
-# Import chroma as the vector store
-from langchain_community.vectorstores import Chroma
-
-# Import vector stores
-from langchain.agents.agent_toolkits import VectorStoreToolkit, VectorStoreInfo
-from langchain.agents import (
-    initialize_agent,
-    AgentType,
-)
+from langchain_community.document_loaders import (
+    PyPDFLoader,
+)  # Import PDF document loaders
+from langchain_community.vectorstores import Chroma  # Import vector DB
+from langchain_core.prompts import PromptTemplate
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
+
+# Import langchain vertex AI implementation
+from langchain_google_vertexai import VertexAI, VertexAIEmbeddings
+
+# imports
+from PIL import Image
 
 st.set_page_config(layout="wide")
 
