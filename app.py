@@ -17,6 +17,9 @@ from langchain_community.document_loaders import (
     PyPDFLoader,
 )  # Import PDF document loaders
 from langchain_community.vectorstores import Chroma  # Import vector DB
+from langchain_community.callbacks.streamlit import (
+    StreamlitCallbackHandler,
+)
 from langchain_core.prompts import PromptTemplate
 from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
 
@@ -27,6 +30,7 @@ from langchain_google_vertexai import VertexAI, VertexAIEmbeddings
 from PIL import Image
 
 st.set_page_config(layout="wide")
+console_output = st.empty()  # Placeholder for console messages
 
 
 @st.cache_resource
@@ -195,7 +199,8 @@ if choice == "Discover":
             # Find the relevant pages
             search = store.similarity_search_with_score(prompt_discover)
             st.write(search[0][0].page_content)
-        response = vector_agent.run(prompt_discover)
+        st_callback = StreamlitCallbackHandler(st.container())
+        response = vector_agent.run(prompt_discover, callbacks=[st_callback])
         st.info(response)
 
 
@@ -215,5 +220,6 @@ if choice == "Automate":
     prompt_choice = st.text_input("Ask a question about the doc", key="prompt_choice")
 
     if prompt_choice:
-        response = df_agent.run(prompt_choice)
+        st_callback = StreamlitCallbackHandler(st.container())
+        response = df_agent.run(prompt_choice, callbacks=[st_callback])
         st.info(response)
