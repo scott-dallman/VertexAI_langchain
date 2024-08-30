@@ -11,6 +11,7 @@ from langchain.agents import AgentType, initialize_agent
 # Import vector stores
 from langchain.agents.agent_toolkits import VectorStoreInfo, VectorStoreToolkit
 from langchain.chains import LLMChain
+from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 
 from langchain_community.document_loaders import (
@@ -68,7 +69,7 @@ if choice == "Create":
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat messages from history on app rerun
+    # Display chat  chat history from session_state
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -77,45 +78,28 @@ if choice == "Create":
         "Ask a question to generate ideas on a topic:", key="prompt_create"
     )
 
-    # Create the LLM chain and memory buffer
-    TEMPLATE = """You are a chatbot having a conversation with a human.
-    {chat_history}
-    Human: {human_input}
-    Chatbot:"""
-
-    prompt = PromptTemplate(
-        input_variables=["chat_history", "human_input"], template=TEMPLATE
-    )
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-
-    llm_chain = LLMChain(
-        llm=llm,
-        prompt=prompt,
-        verbose=True,
-        memory=memory,
-    )
-
-    # # Testing out conversation Chain
-    # memory = ConversationBufferMemory(memory_key="history", return_messages=True)
-    # conversation = ConversationChain(
-    #     llm=llm,
-    #     verbose=True,
-    #     memory=memory
-    # )
+    # LLM Conversation Chain
+    memory = ConversationBufferMemory(memory_key="history", return_messages=True)
+    conversation = ConversationChain(llm=llm, verbose=False, memory=memory)
 
     # Response from LLM
     if prompt_create:
         # Display user message in chat message container
-        st.chat_message("user").markdown(prompt_create)
+        st.chat_message("human").markdown(prompt_create)
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt_create})
 
-        response = llm_chain.predict(human_input=prompt_create)
+        # Get the response from the ConversationChain
+        response = conversation.predict(input=prompt_create)
+
         # Display assistant response in chat message container
-        with st.chat_message("assistant"):
+        with st.chat_message("ai"):
             st.markdown(response)
         # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "ai", "content": response})
+
+        # Update the ConversationBufferMemory with the chat history from session state
+        memory.chat_memory.messages = st.session_state.messages
 
 
 # The selection to summarize content from a LLM
